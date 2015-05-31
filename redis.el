@@ -54,11 +54,6 @@
   :type 'file
   :group 'redis)
 
-(defcustom redis-cli-options nil
-  "List of aditional options for `redis-cli-executable'."
-  :type '(repeat string)
-  :group 'redis)
-
 (defvar redis-process-buffer-name "*redis*")
 
 (defconst redis-login-default-params '((host :default "127.0.0.1")
@@ -83,43 +78,38 @@
 ;;                         (json-read)))
 ;;        (keywords (mapcar (lambda (e) (split-string (symbol-name (car e)) "\s+" t))
 ;;                          commands-json)))
-;;   (sort (apply 'append keywords) 'string<))
+;;   (sort (delete-dups (apply 'append keywords)) 'string<))
 
 (defconst redis-keywords
-  '("ADDSLOTS" "APPEND" "AUTH" "BGREWRITEAOF"
-    "BGSAVE" "BITCOUNT" "BITOP" "BITPOS" "BLPOP" "BRPOP" "BRPOPLPUSH"
-    "CLIENT" "CLIENT" "CLIENT" "CLIENT" "CLIENT" "CLUSTER" "CLUSTER"
-    "CLUSTER" "CLUSTER" "CLUSTER" "CLUSTER" "CLUSTER" "CLUSTER"
-    "CLUSTER" "CLUSTER" "CLUSTER" "CLUSTER" "CLUSTER" "CLUSTER"
-    "CLUSTER" "CLUSTER" "CLUSTER" "CLUSTER" "COMMAND" "COMMAND"
-    "COMMAND" "COMMAND" "CONFIG" "CONFIG" "CONFIG" "CONFIG" "COUNT"
-    "COUNT-FAILURE-REPORTS" "COUNTKEYSINSLOT" "DBSIZE" "DEBUG" "DEBUG"
-    "DECR" "DECRBY" "DEL" "DELSLOTS" "DISCARD" "DUMP" "ECHO" "EVAL"
-    "EVALSHA" "EXEC" "EXISTS" "EXISTS" "EXPIRE" "EXPIREAT" "FAILOVER"
-    "FLUSH" "FLUSHALL" "FLUSHDB" "FORGET" "GET" "GET" "GETBIT" "GETKEYS"
-    "GETKEYSINSLOT" "GETNAME" "GETRANGE" "GETSET" "HDEL" "HEXISTS"
-    "HGET" "HGETALL" "HINCRBY" "HINCRBYFLOAT" "HKEYS" "HLEN" "HMGET"
-    "HMSET" "HSCAN" "HSET" "HSETNX" "HSTRLEN" "HVALS" "INCR" "INCRBY"
-    "INCRBYFLOAT" "INFO" "INFO" "INFO" "KEYS" "KEYSLOT" "KILL" "KILL"
-    "LASTSAVE" "LINDEX" "LINSERT" "LIST" "LLEN" "LOAD" "LPOP" "LPUSH"
-    "LPUSHX" "LRANGE" "LREM" "LSET" "LTRIM" "MEET" "MGET" "MIGRATE"
-    "MONITOR" "MOVE" "MSET" "MSETNX" "MULTI" "NODES" "OBJECT" "OBJECT"
-    "PAUSE" "PERSIST" "PEXPIRE" "PEXPIREAT" "PFADD" "PFCOUNT" "PFMERGE"
-    "PING" "PSETEX" "PSUBSCRIBE" "PTTL" "PUBLISH" "PUBSUB"
-    "PUNSUBSCRIBE" "QUIT" "RANDOMKEY" "RENAME" "RENAMENX" "REPLICATE"
-    "RESET" "RESETSTAT" "RESTORE" "REWRITE" "ROLE" "RPOP" "RPOPLPUSH"
-    "RPUSH" "RPUSHX" "SADD" "SAVE" "SAVECONFIG" "SCAN" "SCARD" "SCRIPT"
-    "SCRIPT" "SCRIPT" "SCRIPT" "SDIFF" "SDIFFSTORE" "SEGFAULT" "SELECT"
-    "SET" "SET" "SET-CONFIG-EPOCH" "SETBIT" "SETEX" "SETNAME" "SETNX"
-    "SETRANGE" "SETSLOT" "SHUTDOWN" "SINTER" "SINTERSTORE" "SISMEMBER"
-    "SLAVEOF" "SLAVES" "SLOTS" "SLOWLOG" "SMEMBERS" "SMOVE" "SORT"
-    "SPOP" "SRANDMEMBER" "SREM" "SSCAN" "STRLEN" "SUBSCRIBE" "SUNION"
-    "SUNIONSTORE" "SYNC" "TIME" "TTL" "TYPE" "UNSUBSCRIBE" "UNWATCH"
-    "WAIT" "WATCH" "ZADD" "ZCARD" "ZCOUNT" "ZINCRBY" "ZINTERSTORE"
-    "ZLEXCOUNT" "ZRANGE" "ZRANGEBYLEX" "ZRANGEBYSCORE" "ZRANK" "ZREM"
-    "ZREMRANGEBYLEX" "ZREMRANGEBYRANK" "ZREMRANGEBYSCORE" "ZREVRANGE"
-    "ZREVRANGEBYLEX" "ZREVRANGEBYSCORE" "ZREVRANK" "ZSCAN" "ZSCORE"
-    "ZUNIONSTORE"))
+  '("ADDSLOTS" "APPEND" "AUTH" "BGREWRITEAOF" "BGSAVE" "BITCOUNT"
+    "BITOP" "BITPOS" "BLPOP" "BRPOP" "BRPOPLPUSH" "CLIENT" "CLUSTER"
+    "COMMAND" "CONFIG" "COUNT" "COUNT-FAILURE-REPORTS"
+    "COUNTKEYSINSLOT" "DBSIZE" "DEBUG" "DECR" "DECRBY" "DEL"
+    "DELSLOTS" "DISCARD" "DUMP" "ECHO" "EVAL" "EVALSHA" "EXEC"
+    "EXISTS" "EXPIRE" "EXPIREAT" "FAILOVER" "FLUSH" "FLUSHALL"
+    "FLUSHDB" "FORGET" "GET" "GETBIT" "GETKEYS" "GETKEYSINSLOT"
+    "GETNAME" "GETRANGE" "GETSET" "HDEL" "HEXISTS" "HGET" "HGETALL"
+    "HINCRBY" "HINCRBYFLOAT" "HKEYS" "HLEN" "HMGET" "HMSET" "HSCAN"
+    "HSET" "HSETNX" "HSTRLEN" "HVALS" "INCR" "INCRBY" "INCRBYFLOAT"
+    "INFO" "KEYS" "KEYSLOT" "KILL" "LASTSAVE" "LINDEX" "LINSERT"
+    "LIST" "LLEN" "LOAD" "LPOP" "LPUSH" "LPUSHX" "LRANGE" "LREM"
+    "LSET" "LTRIM" "MEET" "MGET" "MIGRATE" "MONITOR" "MOVE" "MSET"
+    "MSETNX" "MULTI" "NODES" "OBJECT" "PAUSE" "PERSIST" "PEXPIRE"
+    "PEXPIREAT" "PFADD" "PFCOUNT" "PFMERGE" "PING" "PSETEX"
+    "PSUBSCRIBE" "PTTL" "PUBLISH" "PUBSUB" "PUNSUBSCRIBE" "QUIT"
+    "RANDOMKEY" "RENAME" "RENAMENX" "REPLICATE" "RESET" "RESETSTAT"
+    "RESTORE" "REWRITE" "ROLE" "RPOP" "RPOPLPUSH" "RPUSH" "RPUSHX"
+    "SADD" "SAVE" "SAVECONFIG" "SCAN" "SCARD" "SCRIPT" "SDIFF"
+    "SDIFFSTORE" "SEGFAULT" "SELECT" "SET" "SET-CONFIG-EPOCH" "SETBIT"
+    "SETEX" "SETNAME" "SETNX" "SETRANGE" "SETSLOT" "SHUTDOWN" "SINTER"
+    "SINTERSTORE" "SISMEMBER" "SLAVEOF" "SLAVES" "SLOTS" "SLOWLOG"
+    "SMEMBERS" "SMOVE" "SORT" "SPOP" "SRANDMEMBER" "SREM" "SSCAN"
+    "STRLEN" "SUBSCRIBE" "SUNION" "SUNIONSTORE" "SYNC" "TIME" "TTL"
+    "TYPE" "UNSUBSCRIBE" "UNWATCH" "WAIT" "WATCH" "ZADD" "ZCARD"
+    "ZCOUNT" "ZINCRBY" "ZINTERSTORE" "ZLEXCOUNT" "ZRANGE"
+    "ZRANGEBYLEX" "ZRANGEBYSCORE" "ZRANK" "ZREM" "ZREMRANGEBYLEX"
+    "ZREMRANGEBYRANK" "ZREMRANGEBYSCORE" "ZREVRANGE" "ZREVRANGEBYLEX"
+    "ZREVRANGEBYSCORE" "ZREVRANK" "ZSCAN" "ZSCORE" "ZUNIONSTORE"))
 
 (defun redis-complete-at-point ()
   "Complete at point in redis mode."
@@ -130,7 +120,7 @@
                             (mapcar 'downcase redis-keywords)))))
 
 (defconst redis-font-lock-keywords
-  `(,(regexp-opt redis-keywords 'symbols)))
+  (list (regexp-opt redis-keywords 'symbols)))
 
 (defun redis-read-args (&optional pipe)
   "Read the login params to redis-cli.
@@ -141,13 +131,12 @@ when send commands with redis protocol."
         (port (redis-cli-get-login 'port (and current-prefix-arg "Port: ")))
         (db (redis-cli-get-login 'db (and current-prefix-arg "Database number: ")))
         (password (and current-prefix-arg (read-passwd "Password: "))))
-    (apply 'append
-           `(,(and host (list "-h" host))
-             ,(and port (list "-p" (number-to-string port)))
-             ,(and db (list "-n" (number-to-string db)))
-             ,(and (not (or (null password) (string= password "")))
-                   (list "-a" password))
-             ,(and pipe (list "--pipe"))))))
+    (append (and host (list "-h" host))
+            (and port (list "-p" (number-to-string port)))
+            (and db (list "-n" (number-to-string db)))
+            (and (not (or (null password) (string= password "")))
+                 (list "-a" password))
+            (and pipe (list "--pipe")))))
 
 (defun redis-cli-get-login (symbol &optional prompt)
   "Read a redis login SYMBOL with PROMPT."
