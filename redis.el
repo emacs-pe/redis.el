@@ -316,6 +316,27 @@ http://redis.io/topics/protocol"
 
 ;;; redis cli
 ;;;###autoload
+(defun redis-cli-bookmark-jump (bookmark)
+  "Restore redis-cli buffer according to BOOKMARK."
+  (let ((default-directory (bookmark-prop-get bookmark 'path))
+        (redis-process-buffer-name (bookmark-prop-get bookmark 'name))
+        (redis-cli-executable (bookmark-prop-get bookmark 'executable))
+        (args (bookmark-prop-get bookmark 'args)))
+    (apply #'redis-cli args)))
+
+(defun redis-cli-bookmark-make-record ()
+  "Create bookmark for redis-cli buffer."
+  (let* ((command (process-command (get-buffer-process (current-buffer))))
+         (executable (car command))
+         (args (cdr command)))
+    (cons (buffer-name)
+          `((name . ,(buffer-name))
+            (path . ,default-directory)
+            (executable . ,executable)
+            (args . ,args)
+            (handler . redis-cli-bookmark-jump)))))
+
+;;;###autoload
 (define-derived-mode redis-cli-mode comint-mode "redis-cli"
   "Major mode for `redis-cli'.
 
@@ -326,6 +347,8 @@ http://redis.io/topics/protocol"
        '(redis-font-lock-keywords nil t))
   (set (make-local-variable 'eldoc-documentation-function)
        #'redis-eldoc-function)
+  (set (make-local-variable 'bookmark-make-record-function)
+       #'redis-cli-bookmark-make-record)
   (define-key redis-cli-mode-map "\t" 'completion-at-point)
   (add-hook 'completion-at-point-functions
             #'redis-complete-at-point nil 'local))
