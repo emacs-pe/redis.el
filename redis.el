@@ -58,7 +58,9 @@
 
 (defconst redis-login-default-params '((host :default "127.0.0.1")
                                        (port :default 6379 :number t)
-                                       (db :number t))
+                                       (db :number t)
+                                       (user :string t)
+                                       (tls :default nil))
   "Default parameters needed to connect to Redis.")
 
 (defconst redis-cli-prompt-regexp
@@ -81,7 +83,7 @@
 ;;   (sort (delete-dups (apply 'append keywords)) 'string<))
 
 (defconst redis-keywords
-  '("ADDSLOTS" "APPEND" "AUTH" "BGREWRITEAOF" "BGSAVE" "BITCOUNT"
+  '("ACL" "ADDSLOTS" "APPEND" "AUTH" "BGREWRITEAOF" "BGSAVE" "BITCOUNT"
     "BITOP" "BITPOS" "BLPOP" "BRPOP" "BRPOPLPUSH" "CLIENT" "CLUSTER"
     "COMMAND" "CONFIG" "COUNT" "COUNT-FAILURE-REPORTS"
     "COUNTKEYSINSLOT" "DBSIZE" "DEBUG" "DECR" "DECRBY" "DEL"
@@ -130,10 +132,14 @@ when send commands with redis protocol."
   (let ((host (redis-cli-get-login 'host (and current-prefix-arg "Hostname: ")))
         (port (redis-cli-get-login 'port (and current-prefix-arg "Port: ")))
         (db (redis-cli-get-login 'db (and current-prefix-arg "Database number: ")))
+        (user (redis-cli-get-login 'user (and current-prefix-arg "User: ")))
+        (tls (redis-cli-get-login 'tls))
         (password (and current-prefix-arg (read-passwd "Password: "))))
     (append (and host (list "-h" host))
             (and port (list "-p" (number-to-string port)))
             (and db (list "-n" (number-to-string db)))
+            (and tls (list "--tls"))
+            (and user (list "--user" user))
             (and (not (or (null password) (string= password "")))
                  (list "-a" password))
             (and pipe (list "--pipe")))))
